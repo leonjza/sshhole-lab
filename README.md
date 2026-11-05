@@ -15,7 +15,11 @@ docker run --rm -it -p 2222:22 ghcr.io/leonjza/sshhole-lab:latest
 In another terminal, connect to the container:
 
 ```bash
-ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -p 2222 alpine@localhost
+ssh \
+    -o StrictHostKeyChecking=no \
+    -o PreferredAuthentications=password \
+    -o PubkeyAuthentication=no \
+    -p 2222 alpine@localhost
 ```
 
 When prompted, enter a password longer than 256 characters twice.
