@@ -3,7 +3,7 @@ FROM alpine:3.24.1
 
 # Keep the pre-fix OpenSSH package set for this reproduction.
 # Alpine's repository now publishes a newer revision.
-ARG ALPINE_ARCH=aarch64
+ARG TARGETARCH
 ARG ALPINE_MAIN_REPO=https://dl-cdn.alpinelinux.org/alpine/v3.24/main
 ARG OPENSSH_PACKAGE_VERSION=10.3_p1-r1
 
@@ -11,6 +11,11 @@ ARG OPENSSH_PACKAGE_VERSION=10.3_p1-r1
 # revision because they have exact-version dependencies on one another.
 RUN set -eux; \
     apk update; \
+    case "$TARGETARCH" in \
+        amd64) alpine_arch=x86_64 ;; \
+        arm64) alpine_arch=aarch64 ;; \
+        *) echo "Unsupported target architecture: $TARGETARCH" >&2; exit 1 ;; \
+    esac; \
     for package in \
         openssh-server-pam \
         openssh-server-common \
@@ -19,7 +24,7 @@ RUN set -eux; \
         apk_file="/tmp/${package}-${OPENSSH_PACKAGE_VERSION}.apk"; \
         wget \
             --output-document="$apk_file" \
-            "${ALPINE_MAIN_REPO}/${ALPINE_ARCH}/${package}-${OPENSSH_PACKAGE_VERSION}.apk"; \
+            "${ALPINE_MAIN_REPO}/${alpine_arch}/${package}-${OPENSSH_PACKAGE_VERSION}.apk"; \
     done; \
     apk add \
         "/tmp/openssh-server-pam-${OPENSSH_PACKAGE_VERSION}.apk" \
